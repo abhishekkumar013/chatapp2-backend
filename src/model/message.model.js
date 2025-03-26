@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const MessageSchema = new mongoose.model(
+const MessageSchema = new mongoose.Schema(
   {
     conversation: {
       type: mongoose.Schema.Types.ObjectId,
@@ -18,4 +18,4 @@ const MessageSchema = new mongoose.model(
   { timestamps: true }
 );
 
-export const MessageModel = mongoose.model("Messsage", MessageSchema);
+export const MessageModel = mongoose.model("Message", MessageSchema);
