@@ -63,7 +63,7 @@ export const SignInController = async (req, res) => {
 
     const options = {
       httpOnly: true,
-      secure: true,
+      secure: false,
       sameSite: "Lax",
     };
     return res.status(200).cookie("token", token, options).json({
@@ -73,6 +73,54 @@ export const SignInController = async (req, res) => {
     });
   } catch (error) {
     return res.status(400).json({
+      message: error.message,
+      success: false,
+    });
+  }
+};
+
+export const SearchMembers = async (req, res) => {
+  try {
+    const filter = req.params.filter;
+
+    const users = await UserModel.find({
+      $and: [
+        { _id: { $ne: req.userId } },
+        {
+          $or: [
+            { name: { $regex: filter, $options: "i" } },
+            { mobileNumber: { $regex: filter }, $options: "i" },
+          ],
+        },
+      ],
+    });
+
+    return res.status(200).json({
+      message: "Members retrieved successfully",
+      success: true,
+      users,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+      success: false,
+    });
+  }
+};
+
+export const Logout = async (req, res) => {
+  try {
+    const options = {
+      httpOnly: true,
+      secure: false,
+      sameSite: "Lax",
+    };
+    return res.clearCookie("token", options).json({
+      message: "User logged out successfully",
+      success: true,
+    });
+  } catch (error) {
+    return res.status(500).json({
       message: error.message,
       success: false,
     });
