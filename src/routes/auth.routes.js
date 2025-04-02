@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  GetAllusers,
   Logout,
   SearchMembers,
   SignInController,
@@ -15,5 +16,5 @@ router.route("/signin").post(SignInController);
 router.use(isAuth);
 router.route("/search").get(SearchMembers);
 router.route("/logout").post(Logout);
-
+router.route("/all").get(GetAllusers);
 export default router;

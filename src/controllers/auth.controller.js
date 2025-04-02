@@ -46,6 +46,7 @@ export const SignInController = async (req, res) => {
       });
     }
     const user = await UserModel.findOne({ mobileNumber });
+
     if (!user) {
       return res.status(404).json({
         message: "User not found",
@@ -53,23 +54,26 @@ export const SignInController = async (req, res) => {
       });
     }
     const isMatch = await user.comparePassword(password);
+
     if (!isMatch) {
       return res.status(401).json({
         message: "Invalid credentials",
         success: false,
       });
     }
+
     const token = await user.generateToken();
 
     const options = {
       httpOnly: true,
       secure: false,
-      sameSite: "Lax",
+      sameSite: "lax",
     };
     return res.status(200).cookie("token", token, options).json({
       message: "User logged in successfully",
       success: true,
       user,
+      token,
     });
   } catch (error) {
     return res.status(400).json({
@@ -81,15 +85,15 @@ export const SignInController = async (req, res) => {
 
 export const SearchMembers = async (req, res) => {
   try {
-    const filter = req.params.filter;
+    const filter = req.query.filter?.toString() || "";
 
     const users = await UserModel.find({
       $and: [
-        { _id: { $ne: req.userId } },
+        { _id: { $ne: req.user._id } },
         {
           $or: [
             { name: { $regex: filter, $options: "i" } },
-            { mobileNumber: { $regex: filter }, $options: "i" },
+            { mobileNumber: { $regex: filter, $options: "i" } },
           ],
         },
       ],
@@ -108,12 +112,34 @@ export const SearchMembers = async (req, res) => {
   }
 };
 
+export const GetAllusers = async (req, res) => {
+  try {
+    // console.log(req.userId);
+    const allusers = await UserModel.find({});
+
+    const filterUser = allusers.filter(
+      (user) => user._id.toString() !== req.user._id.toString()
+    );
+
+    return res.status(200).json({
+      message: "All users fetched",
+      users: filterUser,
+      success: true,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+      success: false,
+    });
+  }
+};
+
 export const Logout = async (req, res) => {
   try {
     const options = {
       httpOnly: true,
       secure: false,
-      sameSite: "Lax",
+      sameSite: "lax",
     };
     return res.clearCookie("token", options).json({
       message: "User logged out successfully",

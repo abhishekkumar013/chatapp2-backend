@@ -4,7 +4,6 @@ import {
 } from "../controllers/conversation.controller.js";
 import express from "express";
 import { isAuth } from "../middleware/auth.middleware.js";
-("express");
 
 const router = express.Router();
 

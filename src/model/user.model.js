@@ -18,16 +18,16 @@ const UserSchema = new mongoose.Schema(
         },
         message: "Please enter a valid 10-digit number",
       },
-      password: {
-        type: String,
-        required: true,
-        minlength: 6,
-      },
-      profilePic: {
-        type: String,
-        default:
-          "https://img.freepik.com/premium-vector/young-man-face-avater-vector-illustration-design_968209-15.jpg?ga=GA1.1.1408379961.1714224392&semt=ais_hybrid",
-      },
+    },
+    password: {
+      type: String,
+      required: true,
+      minlength: 6,
+    },
+    profilePic: {
+      type: String,
+      default:
+        "https://img.freepik.com/premium-vector/young-man-face-avater-vector-illustration-design_968209-15.jpg?ga=GA1.1.1408379961.1714224392&semt=ais_hybrid",
     },
   },
   { timestamps: true }
@@ -39,10 +39,10 @@ UserSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
-UserSchema.method.comparePassword = async function (password) {
+UserSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
-UserSchema.method.generateToken = async function () {
+UserSchema.methods.generateToken = async function () {
   return jwt.sign(
     {
       _id: this._id,
